@@ -39,6 +39,13 @@ engineSchematic.eachWithIndex { row, int rowIndex ->
                 return it.key.contains("lower") && it.value && it.value ==~ /\d/
             }
 
+            // Remove values that are part of the same number.
+            // This solves the following edge cases:
+            /*
+            *   444     4.4     444
+            *   .*.     .*.     .*.
+            *   ...     ...     333
+             */
             if(adjacentValues.get("upperValue") ==~ /\d/) {
                 if(upperValues.size() == 2) {
                     adjacentNumbers.remove("upperValue")
@@ -61,7 +68,7 @@ engineSchematic.eachWithIndex { row, int rowIndex ->
             int gearRatio = 1
             if (adjacentNumbers.size() == 2) {
                 adjacentNumbers.each { adjacentValue ->
-                    gearRatio *= getPartNumber(engineSchematic, adjacentValue, rowIndex, colIndex, row.length)
+                    gearRatio *= getAdjacentPartNumber(engineSchematic, adjacentValue, rowIndex, colIndex, row.length)
                 }
                 sumOfGearRatios += gearRatio
             }
@@ -76,7 +83,7 @@ engineSchematic.eachWithIndex { row, int rowIndex ->
 println("Result for part 1: ${sumOfPartNumbers}")
 println("Result for part 2: ${sumOfGearRatios}")
 
-int getPartNumber(List<String[]> engineSchematic, Map.Entry<String, String> adjacentValue, int rowPointer, int colPointer, int rowLength) {
+int getAdjacentPartNumber(List<String[]> engineSchematic, Map.Entry<String, String> adjacentValue, int rowPointer, int colPointer, int rowLength) {
     String number = ""
     switch (adjacentValue.key.toLowerCase()) {
         case { it.contains("upper") }:
